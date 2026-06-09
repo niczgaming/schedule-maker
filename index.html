@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IRIAM Schedule Generator Stable</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@400;700;900&family=Kaisei+Decol:wght@400;700&family=Kaisei+Tokumin:wght@400;700&family=Kiwi+Maru:wght@400;500&family=Yusei+Magic&family=DotGothic16&family=RocknRoll+One&family=Hachi+Maru+Pop&family=Reggae+One&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 body{margin:0;background:#111;color:#fff;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
 .wrap{display:flex;gap:20px;padding:20px;box-sizing:border-box}
@@ -18,6 +23,7 @@ input[type="color"]{height:42px;padding:4px}
 textarea{resize:vertical;min-height:52px}
 button{margin-top:14px;background:#ff8db2;color:#111;font-weight:700;cursor:pointer}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scheduleInputGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .checks label{margin:0;background:#101010;border-radius:10px;padding:9px}
@@ -47,14 +53,14 @@ small{color:#aaa}
   color:#aaa;
   margin-top:2px;
 }
-@media(max-width:900px){.wrap{flex-direction:column;padding:10px}.panel{width:100%;max-height:none}.stage{width:100%}}
+@media(max-width:900px){.wrap{flex-direction:column;padding:10px}.panel{width:100%;max-height:none}.stage{width:100%}.scheduleInputGrid{grid-template-columns:1fr}.scheduleInputGrid>div{grid-column:auto!important;grid-row:auto!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="panel">
     <h2 style="margin-top:0;">IRIAM スケジュール</h2>
-    <small>version1.1 下部プレビューでドラッグ移動出来るようにしました</small>
+    <small>v1.2 イベント名追加、フォントの種類を増やしました</small>
 
     <label>背景画像</label>
     <input type="file" id="bgFile" accept="image/*">
@@ -68,6 +74,7 @@ small{color:#aaa}
       <label><input type="checkbox" id="showName" checked>配信者名表示</label>
       <label><input type="checkbox" id="showMemo" checked>一言メモ表示</label>
       <label><input type="checkbox" id="showBoxes" checked>枠表示</label>
+      <label><input type="checkbox" id="showEvent" checked>イベント名表示</label>
     </div>
   </div>
 </div>
@@ -80,14 +87,33 @@ small{color:#aaa}
 
     <label>フォント</label>
     <select id="titleFont">
-      <option value="Arial, sans-serif">Arial</option>
       <option value="system-ui, -apple-system, 'Noto Sans JP', sans-serif">ゴシック</option>
       <option value="'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif">丸ゴシック</option>
       <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
       <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
       <option value="serif">Serif</option>
       <option value="monospace">Monospace</option>
-    </select>
+
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
 
     <div class="row">
       <div>
@@ -106,11 +132,130 @@ small{color:#aaa}
   </div>
 </div>
 
+
+<div class="section" open>
+  <summary>イベント名</summary>
+  <div class="inner">
+
+
+    <label>イベント名</label>
+    <input type="text" id="eventName" value="">
+
+    <label>イベント名フォント</label>
+    <select id="eventFont">
+
+      <option value="system-ui, -apple-system, 'Noto Sans JP', sans-serif">ゴシック</option>
+      <option value="'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif">丸ゴシック</option>
+      <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
+      <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
+      <option value="serif">Serif</option>
+      <option value="monospace">Monospace</option>
+    
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
+
+    <div class="row">
+      <div>
+        <label>イベント名サイズ</label>
+        <input type="number" id="eventSize" value="34" min="10" max="120">
+      </div>
+      <div>
+        <label>イベント名太さ</label>
+        <select id="eventWeight">
+          <option value="500">普通</option>
+          <option value="700" selected>太め</option>
+          <option value="900">極太</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="section" open>
   <summary>日付・曜日</summary>
   <div class="inner">
     <label>スケジュール開始日</label>
     <input type="date" id="startDate">
+
+    <label>曜日フォント</label>
+    <select id="dayFont">
+
+      <option value="system-ui, -apple-system, 'Noto Sans JP', sans-serif">ゴシック</option>
+      <option value="'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif">丸ゴシック</option>
+      <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
+      <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
+      <option value="serif">Serif</option>
+      <option value="monospace">Monospace</option>
+    
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
+
+    <label>日付フォント</label>
+    <select id="dateFont">
+
+      <option value="system-ui, -apple-system, 'Noto Sans JP', sans-serif">ゴシック</option>
+      <option value="'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif">丸ゴシック</option>
+      <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
+      <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
+      <option value="serif">Serif</option>
+      <option value="monospace">Monospace</option>
+    
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
 
     <div class="row">
       <div>
@@ -138,9 +283,28 @@ small{color:#aaa}
       <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
       <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
       <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
       <option value="serif">Serif</option>
       <option value="monospace">Monospace</option>
-    </select>
+
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
 
     <div class="row">
       <div>
@@ -172,9 +336,28 @@ small{color:#aaa}
       <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
       <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
       <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
       <option value="serif">Serif</option>
       <option value="monospace">Monospace</option>
-    </select>
+
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
 
     <div class="row">
       <div>
@@ -203,9 +386,28 @@ small{color:#aaa}
       <option value="'Yu Mincho','Hiragino Mincho ProN',serif">明朝</option>
       <option value="'Comic Sans MS','Hiragino Maru Gothic ProN',cursive">手書き風</option>
       <option value="Arial, sans-serif">Arial</option>
+      <option value="'Arial Black', sans-serif">Arial Black</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Times New Roman', serif">Times</option>
+      <option value="'Courier New', monospace">Courier</option>
       <option value="serif">Serif</option>
       <option value="monospace">Monospace</option>
-    </select>
+
+
+<option value="'Zen Maru Gothic', sans-serif">Zen Maru Gothic</option>
+<option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded</option>
+<option value="'Kaisei Decol', serif">Kaisei Decol</option>
+<option value="'Kaisei Tokumin', serif">Kaisei Tokumin</option>
+<option value="'Kiwi Maru', serif">Kiwi Maru</option>
+<option value="'Yusei Magic', sans-serif">Yusei Magic</option>
+<option value="'DotGothic16', sans-serif">DotGothic16</option>
+<option value="'RocknRoll One', sans-serif">RocknRoll One</option>
+<option value="'Hachi Maru Pop', cursive">Hachi Maru Pop</option>
+<option value="'Reggae One', cursive">Reggae One</option>
+<option value="'Shippori Mincho', serif">Shippori Mincho</option>
+</select>
 
     <div class="row">
       <div>
@@ -222,14 +424,14 @@ small{color:#aaa}
       </div>
     </div>
 
-    <div class="grid">
-      <div><label>1</label><textarea id="s0">ゆる雑</textarea></div>
-      <div><label>2</label><textarea id="s1">歌枠</textarea></div>
-      <div><label>3</label><textarea id="s2">作業枠</textarea></div>
-      <div><label>4</label><textarea id="s3">耐久</textarea></div>
-      <div><label>5</label><textarea id="s4">企画</textarea></div>
-      <div><label>6</label><textarea id="s5">おえかき</textarea></div>
-      <div><label>7</label><textarea id="s6">おやすみ</textarea></div>
+    <div class="scheduleInputGrid">
+      <div style="grid-column:1;grid-row:1;"><label>1</label><textarea id="s0">ゆる雑</textarea></div>
+      <div style="grid-column:1;grid-row:2;"><label>2</label><textarea id="s1">歌枠</textarea></div>
+      <div style="grid-column:1;grid-row:3;"><label>3</label><textarea id="s2">作業枠</textarea></div>
+      <div style="grid-column:1;grid-row:4;"><label>4</label><textarea id="s3">耐久</textarea></div>
+      <div style="grid-column:2;grid-row:1;"><label>5</label><textarea id="s4">企画</textarea></div>
+      <div style="grid-column:2;grid-row:2;"><label>6</label><textarea id="s5">おえかき</textarea></div>
+      <div style="grid-column:2;grid-row:3;"><label>7</label><textarea id="s6">おやすみ</textarea></div>
     </div>
   </div>
 </div>
@@ -325,6 +527,7 @@ let bgImg = null;
 
 const defaultItems = [
   {type:"title", x:768, y:90, w:700, h:90},
+  {type:"event", x:768, y:145, w:700, h:55},
   {type:"box", x:55, y:135, w:400, h:130},
   {type:"box", x:55, y:315, w:400, h:130},
   {type:"box", x:55, y:495, w:400, h:130},
@@ -336,7 +539,7 @@ const defaultItems = [
   {type:"memo", x:768, y:970, w:700, h:45},
 ];
 
-let items = JSON.parse(localStorage.getItem("scheduleItemsStableV9") || "null") || structuredClone(defaultItems);
+let items = JSON.parse(localStorage.getItem("scheduleItemsStableV12") || "null") || structuredClone(defaultItems);
 const dayNames = ["sun","mon","tue","wed","thu","fri","sat"];
 let dragging = null;
 let dragOffsetX = 0;
@@ -361,7 +564,7 @@ function getPointerPos(e){
   };
 }
 function getItemBounds(item){
-  if(item.type === "name" || item.type === "memo" || item.type === "title"){
+  if(item.type === "name" || item.type === "memo" || item.type === "title" || item.type === "event"){
     return {x:item.x - item.w/2, y:item.y - item.h/2, w:item.w, h:item.h};
   }
   return item;
@@ -371,6 +574,7 @@ function isVisibleItem(item){
   if(item.type === "name") return show("showName");
   if(item.type === "memo") return show("showMemo");
   if(item.type === "box") return show("showBoxes");
+  if(item.type === "event") return show("showEvent");
   return true;
 }
 function hitTest(x,y){
@@ -381,7 +585,7 @@ function hitTest(x,y){
   }
   return null;
 }
-function saveItems(){localStorage.setItem("scheduleItemsStableV9", JSON.stringify(items))}
+function saveItems(){localStorage.setItem("scheduleItemsStableV12", JSON.stringify(items))}
 function drawCoverImage(img){
   const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
   const w = img.width * scale;
@@ -442,6 +646,12 @@ function render(){
     ctx.textAlign = "center";
     ctx.font = `${document.getElementById("titleWeight").value} ${Number(document.getElementById("titleSize").value || 62)}px ${document.getElementById("titleFont").value}`;
     drawText(document.getElementById("titleText").value, titleItem.x, titleItem.y);
+
+    const eventItem = items.find(i=>i.type==="event");
+    if(eventItem && document.getElementById("eventName").value.trim()){
+      ctx.font = `${document.getElementById("eventWeight").value} ${Number(document.getElementById("eventSize").value || 34)}px ${document.getElementById("eventFont").value}`;
+      drawText(document.getElementById("eventName").value, eventItem.x, eventItem.y);
+    }
   }
 
   const boxItems = items.filter(i=>i.type==="box");
@@ -473,10 +683,10 @@ function render(){
 
       ctx.textAlign = "left";
 
-      ctx.font = `700 ${Number(document.getElementById("daySize").value || 28)}px Arial, sans-serif`;
+      ctx.font = `700 ${Number(document.getElementById("daySize").value || 28)}px ${document.getElementById("dayFont").value}`;
       drawText(day, item.x + 24, item.y + 38);
 
-      ctx.font = `700 ${Number(document.getElementById("dateSize").value || 44)}px Arial, sans-serif`;
+      ctx.font = `700 ${Number(document.getElementById("dateSize").value || 44)}px ${document.getElementById("dateFont").value}`;
       drawText(dateText, item.x + 24, item.y + 88);
 
       const memoSize = Number(document.getElementById("scheduleMemoSize").value || 38);
@@ -525,7 +735,7 @@ canvas.addEventListener("pointermove", e=>{
   if(dragging === null) return;
   const p = getPointerPos(e);
   const item = items[dragging];
-  if(item.type === "name" || item.type === "memo" || item.type === "title"){
+  if(item.type === "name" || item.type === "memo" || item.type === "title" || item.type === "event"){
     item.x = Math.max(item.w/2, Math.min(canvas.width - item.w/2, p.x - dragOffsetX + item.w/2));
     item.y = Math.max(item.h/2, Math.min(canvas.height - item.h/2, p.y - dragOffsetY + item.h/2));
   }else{
