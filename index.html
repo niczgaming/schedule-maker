@@ -60,7 +60,7 @@ small{color:#aaa}
 <div class="wrap">
   <div class="panel">
     <h2 style="margin-top:0;">IRIAM スケジュール</h2>
-    <small>v1.31 文字揃え設定を各項目へ移動・UI整理</small>
+    <small>v1.32 スケジュール枠の種類追加、スケジュール文字の位置調整、文字の揃え機能追加</small>
 
     <label>背景画像</label>
     <input type="file" id="bgFile" accept="image/*">
@@ -146,7 +146,7 @@ small{color:#aaa}
 
 
     <label>イベント名</label>
-    <input type="text" id="eventName" value="">
+    <input type="text" id="eventName" value="イベント名">
 
     <label>イベント名フォント</label>
     <select id="eventFont">
@@ -288,7 +288,7 @@ small{color:#aaa}
   <summary>配信者名</summary>
   <div class="inner">
     <label>配信者名</label>
-    <input type="text" id="name" value="のんびりB2キープ！">
+    <input type="text" id="name" value="配信者名">
 
     <label>フォント</label>
     <select id="nameFont">
@@ -348,7 +348,7 @@ small{color:#aaa}
   <summary>一言メモ</summary>
   <div class="inner">
     <label>一言メモ</label>
-    <textarea id="memo">今週もよろしく！</textarea>
+    <textarea id="memo">一言メモ</textarea>
 
     <label>フォント</label>
     <select id="oneMemoFont">
@@ -580,14 +580,14 @@ const defaultItems = [
   {type:"box", x:55, y:315, w:400, h:130},
   {type:"box", x:55, y:495, w:400, h:130},
   {type:"box", x:55, y:675, w:400, h:130},
-  {type:"box", x:1095, y:225, w:400, h:130},
-  {type:"box", x:1095, y:585, w:400, h:130},
-  {type:"box", x:1095, y:765, w:400, h:130},
+  {type:"box", x:1095, y:315, w:400, h:130},
+  {type:"box", x:1095, y:495, w:400, h:130},
+  {type:"box", x:1095, y:675, w:400, h:130},
   {type:"name", x:768, y:920, w:700, h:70},
   {type:"memo", x:768, y:970, w:700, h:45},
 ];
 
-let items = JSON.parse(localStorage.getItem("scheduleItemsStableV131") || "null") || structuredClone(defaultItems);
+let items = JSON.parse(localStorage.getItem("scheduleItemsStableV132b") || "null") || structuredClone(defaultItems);
 const dayNames = ["sun","mon","tue","wed","thu","fri","sat"];
 let dragging = null;
 let dragOffsetX = 0;
@@ -633,7 +633,7 @@ function hitTest(x,y){
   }
   return null;
 }
-function saveItems(){localStorage.setItem("scheduleItemsStableV131", JSON.stringify(items))}
+function saveItems(){localStorage.setItem("scheduleItemsStableV132b", JSON.stringify(items))}
 function drawCoverImage(img){
   const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
   const w = img.width * scale;
