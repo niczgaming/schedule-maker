@@ -135,6 +135,7 @@ small{color:#aaa}
       <option value="center" selected>中央</option>
       <option value="right">右寄せ</option>
     </select>
+
   </div>
 </div>
 
@@ -145,7 +146,7 @@ small{color:#aaa}
 
 
     <label>イベント名</label>
-    <input type="text" id="eventName" value="イベント名">
+    <input type="text" id="eventName" value="">
 
     <label>イベント名フォント</label>
     <select id="eventFont">
@@ -191,12 +192,14 @@ small{color:#aaa}
           <option value="900">極太</option>
         </select>
       </div>
-        <label>揃え</label>
+    </div>
+    <label>揃え</label>
     <select id="eventAlign">
       <option value="left">左寄せ</option>
       <option value="center" selected>中央</option>
       <option value="right">右寄せ</option>
     </select>
+
   </div>
 </div>
 
@@ -285,7 +288,7 @@ small{color:#aaa}
   <summary>配信者名</summary>
   <div class="inner">
     <label>配信者名</label>
-    <input type="text" id="name" value="配信者名">
+    <input type="text" id="name" value="のんびりB2キープ！">
 
     <label>フォント</label>
     <select id="nameFont">
@@ -331,6 +334,13 @@ small{color:#aaa}
         </select>
       </div>
     </div>
+    <label>揃え</label>
+    <select id="nameAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+
   </div>
 </div>
 
@@ -338,7 +348,7 @@ small{color:#aaa}
   <summary>一言メモ</summary>
   <div class="inner">
     <label>一言メモ</label>
-    <textarea id="memo">一言メモ</textarea>
+    <textarea id="memo">今週もよろしく！</textarea>
 
     <label>フォント</label>
     <select id="oneMemoFont">
@@ -384,6 +394,13 @@ small{color:#aaa}
         </select>
       </div>
     </div>
+    <label>揃え</label>
+    <select id="memoAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+
   </div>
 </div>
 
@@ -434,6 +451,13 @@ small{color:#aaa}
         </select>
       </div>
     </div>
+    <label>揃え</label>
+    <select id="scheduleAlign">
+      <option value="left" selected>左寄せ</option>
+      <option value="center">中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+
 
     <div class="scheduleInputGrid">
       <div style="grid-column:1;grid-row:1;"><label>1</label><textarea id="s0">ゆる雑</textarea></div>
@@ -531,52 +555,6 @@ small{color:#aaa}
   </div>
 </div>
 
-
-<div class="row">
-  <div>
-    <label>SCHEDULE揃え</label>
-    <select id="titleAlign">
-      <option value="left">左寄せ</option>
-      <option value="center" selected>中央</option>
-      <option value="right">右寄せ</option>
-    </select>
-  </div>
-  <div>
-    <label>イベント名揃え</label>
-    <select id="eventAlign">
-      <option value="left">左寄せ</option>
-      <option value="center" selected>中央</option>
-      <option value="right">右寄せ</option>
-    </select>
-  </div>
-</div>
-
-<div class="row">
-  <div>
-    <label>配信者名揃え</label>
-    <select id="nameAlign">
-      <option value="left">左寄せ</option>
-      <option value="center" selected>中央</option>
-      <option value="right">右寄せ</option>
-    </select>
-  </div>
-  <div>
-    <label>一言メモ揃え</label>
-    <select id="memoAlign">
-      <option value="left">左寄せ</option>
-      <option value="center" selected>中央</option>
-      <option value="right">右寄せ</option>
-    </select>
-  </div>
-</div>
-
-<label>スケジュールメモ揃え</label>
-<select id="scheduleAlign">
-  <option value="left" selected>左寄せ</option>
-  <option value="center">中央</option>
-  <option value="right">右寄せ</option>
-</select>
-
 <button id="resetBtn">位置を初期化</button>
     <button id="exportJsonBtn">位置JSON保存</button>
     <button id="importJsonBtn">位置JSON読込</button>
@@ -609,7 +587,7 @@ const defaultItems = [
   {type:"memo", x:768, y:970, w:700, h:45},
 ];
 
-let items = JSON.parse(localStorage.getItem("scheduleItemsStableV13") || "null") || structuredClone(defaultItems);
+let items = JSON.parse(localStorage.getItem("scheduleItemsStableV131") || "null") || structuredClone(defaultItems);
 const dayNames = ["sun","mon","tue","wed","thu","fri","sat"];
 let dragging = null;
 let dragOffsetX = 0;
@@ -655,7 +633,7 @@ function hitTest(x,y){
   }
   return null;
 }
-function saveItems(){localStorage.setItem("scheduleItemsStableV13", JSON.stringify(items))}
+function saveItems(){localStorage.setItem("scheduleItemsStableV131", JSON.stringify(items))}
 function drawCoverImage(img){
   const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
   const w = img.width * scale;
@@ -760,7 +738,6 @@ function roundedRectPath(x,y,w,h,r){
   ctx.roundRect(x,y,w,h,r);
 }
 
-
 function alignX(baseX, width, align){
   if(align === "left") return baseX - width / 2;
   if(align === "right") return baseX + width / 2;
@@ -770,12 +747,6 @@ function applyTextAlign(align){
   if(align === "left") ctx.textAlign = "left";
   else if(align === "right") ctx.textAlign = "right";
   else ctx.textAlign = "center";
-}
-
-function setAlign(mode){
-  if(mode==="left") ctx.textAlign="left";
-  else if(mode==="right") ctx.textAlign="right";
-  else ctx.textAlign="center";
 }
 
 function drawText(text,x,y){
