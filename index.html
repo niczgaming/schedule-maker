@@ -60,7 +60,7 @@ small{color:#aaa}
 <div class="wrap">
   <div class="panel">
     <h2 style="margin-top:0;">IRIAM スケジュール</h2>
-    <small>v1.3 スケジュール枠の種類追加、スケジュールメモの文字の位置調整</small>
+    <small>v1.31 文字揃え設定を各項目へ移動・UI整理</small>
 
     <label>背景画像</label>
     <input type="file" id="bgFile" accept="image/*">
@@ -129,6 +129,12 @@ small{color:#aaa}
         </select>
       </div>
     </div>
+    <label>揃え</label>
+    <select id="titleAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
   </div>
 </div>
 
@@ -139,7 +145,7 @@ small{color:#aaa}
 
 
     <label>イベント名</label>
-    <input type="text" id="eventName" value="イベント名">
+    <input type="text" id="eventName" value="">
 
     <label>イベント名フォント</label>
     <select id="eventFont">
@@ -185,7 +191,12 @@ small{color:#aaa}
           <option value="900">極太</option>
         </select>
       </div>
-    </div>
+        <label>揃え</label>
+    <select id="eventAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
   </div>
 </div>
 
@@ -274,7 +285,7 @@ small{color:#aaa}
   <summary>配信者名</summary>
   <div class="inner">
     <label>配信者名</label>
-    <input type="text" id="name" value="配信者名">
+    <input type="text" id="name" value="のんびりB2キープ！">
 
     <label>フォント</label>
     <select id="nameFont">
@@ -327,7 +338,7 @@ small{color:#aaa}
   <summary>一言メモ</summary>
   <div class="inner">
     <label>一言メモ</label>
-    <textarea id="memo">一言メモ</textarea>
+    <textarea id="memo">今週もよろしく！</textarea>
 
     <label>フォント</label>
     <select id="oneMemoFont">
@@ -520,6 +531,52 @@ small{color:#aaa}
   </div>
 </div>
 
+
+<div class="row">
+  <div>
+    <label>SCHEDULE揃え</label>
+    <select id="titleAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+  </div>
+  <div>
+    <label>イベント名揃え</label>
+    <select id="eventAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+  </div>
+</div>
+
+<div class="row">
+  <div>
+    <label>配信者名揃え</label>
+    <select id="nameAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+  </div>
+  <div>
+    <label>一言メモ揃え</label>
+    <select id="memoAlign">
+      <option value="left">左寄せ</option>
+      <option value="center" selected>中央</option>
+      <option value="right">右寄せ</option>
+    </select>
+  </div>
+</div>
+
+<label>スケジュールメモ揃え</label>
+<select id="scheduleAlign">
+  <option value="left" selected>左寄せ</option>
+  <option value="center">中央</option>
+  <option value="right">右寄せ</option>
+</select>
+
 <button id="resetBtn">位置を初期化</button>
     <button id="exportJsonBtn">位置JSON保存</button>
     <button id="importJsonBtn">位置JSON読込</button>
@@ -702,6 +759,25 @@ function roundedRectPath(x,y,w,h,r){
   ctx.beginPath();
   ctx.roundRect(x,y,w,h,r);
 }
+
+
+function alignX(baseX, width, align){
+  if(align === "left") return baseX - width / 2;
+  if(align === "right") return baseX + width / 2;
+  return baseX;
+}
+function applyTextAlign(align){
+  if(align === "left") ctx.textAlign = "left";
+  else if(align === "right") ctx.textAlign = "right";
+  else ctx.textAlign = "center";
+}
+
+function setAlign(mode){
+  if(mode==="left") ctx.textAlign="left";
+  else if(mode==="right") ctx.textAlign="right";
+  else ctx.textAlign="center";
+}
+
 function drawText(text,x,y){
   const sw = Number(document.getElementById("strokeWidth").value || 0);
   if(sw > 0){
@@ -712,7 +788,7 @@ function drawText(text,x,y){
   ctx.fillStyle = document.getElementById("textColor").value;
   ctx.fillText(text,x,y);
 }
-function wrapText(text,x,y,maxWidth,lineHeight){
+function wrapText(text,x,y,maxWidth,lineHeight,align="left"){
   let line = "";
   const lines = [];
   for(const ch of text){
@@ -722,6 +798,7 @@ function wrapText(text,x,y,maxWidth,lineHeight){
     else{line=test}
   }
   lines.push(line);
+  applyTextAlign(align);
   lines.slice(0,3).forEach((l,i)=>drawText(l,x,y+i*lineHeight));
 }
 function render(){
@@ -747,16 +824,18 @@ function render(){
 
   const titleItem = items.find(i=>i.type==="title");
   if(show("showTitle")){
-    ctx.textAlign = "center";
+    const titleAlign = document.getElementById("titleAlign")?.value || "center";
+    applyTextAlign(titleAlign);
     ctx.font = `${document.getElementById("titleWeight").value} ${Number(document.getElementById("titleSize").value || 62)}px ${document.getElementById("titleFont").value}`;
-    drawText(document.getElementById("titleText").value, titleItem.x, titleItem.y);
+    drawText(document.getElementById("titleText").value, alignX(titleItem.x, titleItem.w, titleAlign), titleItem.y);
   }
 
   const eventItem = items.find(i=>i.type==="event");
   if(show("showEvent") && eventItem && document.getElementById("eventName").value.trim()){
-    ctx.textAlign = "center";
+    const eventAlign = document.getElementById("eventAlign")?.value || "center";
+    applyTextAlign(eventAlign);
     ctx.font = `${document.getElementById("eventWeight").value} ${Number(document.getElementById("eventSize").value || 34)}px ${document.getElementById("eventFont").value}`;
-    drawText(document.getElementById("eventName").value, eventItem.x, eventItem.y);
+    drawText(document.getElementById("eventName").value, alignX(eventItem.x, eventItem.w, eventAlign), eventItem.y);
   }
 
   const boxItems = items.filter(i=>i.type==="box");
@@ -798,20 +877,26 @@ function render(){
       const memoSize = Number(document.getElementById("scheduleMemoSize").value || 38);
       ctx.font = `${document.getElementById("scheduleMemoWeight").value} ${memoSize}px ${document.getElementById("scheduleMemoFont").value}`;
       const textY = item.y + (item.h / 2) + (memoSize / 3);
-      wrapText(document.getElementById("s"+index).value, item.x + 175, textY, item.w - 200, memoSize * 1.15);
+      const scheduleAlign = document.getElementById("scheduleAlign")?.value || "left";
+      const memoTextX = scheduleAlign === "left" ? item.x + 175 : (scheduleAlign === "right" ? item.x + item.w - 24 : item.x + item.w / 2);
+      const memoMaxWidth = scheduleAlign === "left" ? item.w - 200 : item.w - 48;
+      wrapText(document.getElementById("s"+index).value, memoTextX, textY, memoMaxWidth, memoSize * 1.15, scheduleAlign);
     });
   }
 
   const nameItem = items.find(i=>i.type==="name");
   const memoItem = items.find(i=>i.type==="memo");
-  ctx.textAlign = "center";
   if(show("showName")){
+    const nameAlign = document.getElementById("nameAlign")?.value || "center";
+    applyTextAlign(nameAlign);
     ctx.font = `${document.getElementById("nameWeight").value} ${Number(document.getElementById("nameSize").value || 54)}px ${document.getElementById("nameFont").value}`;
-    drawText(document.getElementById("name").value, nameItem.x, nameItem.y);
+    drawText(document.getElementById("name").value, alignX(nameItem.x, nameItem.w, nameAlign), nameItem.y);
   }
   if(show("showMemo")){
+    const memoAlign = document.getElementById("memoAlign")?.value || "center";
+    applyTextAlign(memoAlign);
     ctx.font = `${document.getElementById("oneMemoWeight").value} ${Number(document.getElementById("oneMemoSize").value || 30)}px ${document.getElementById("oneMemoFont").value}`;
-    drawText(document.getElementById("memo").value, memoItem.x, memoItem.y);
+    drawText(document.getElementById("memo").value, alignX(memoItem.x, memoItem.w, memoAlign), memoItem.y);
   }
 
   ctx.shadowBlur = 0;
