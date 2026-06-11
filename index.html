@@ -60,7 +60,7 @@ small{color:#aaa}
 <div class="wrap">
   <div class="panel">
     <h2 style="margin-top:0;">IRIAM スケジュール</h2>
-    <small>v1.2 イベント名追加、フォントの種類を増やしました</small>
+    <small>v1.5 ガラス・チケット・吹き出し枠追加</small>
 
     <label>背景画像</label>
     <input type="file" id="bgFile" accept="image/*">
@@ -494,7 +494,20 @@ small{color:#aaa}
       </div>
     </div>
 
-    <label>枠の角丸</label>
+    
+<label>枠スタイル</label>
+<select id="boxStyle">
+  <option value="simple">シンプル</option>
+  <option value="round">丸枠</option>
+  <option value="double">二重枠</option>
+  <option value="leftbar">左帯付き</option>
+  <option value="neon">ネオン</option>
+  <option value="glass">ガラス風</option>
+  <option value="ticket">チケット風</option>
+  <option value="speech">吹き出し風</option>
+</select>
+
+<label>枠の角丸</label>
     <input type="number" id="boxRadius" value="24" min="0" max="80">
   </div>
 </div>
@@ -539,7 +552,7 @@ const defaultItems = [
   {type:"memo", x:768, y:970, w:700, h:45},
 ];
 
-let items = JSON.parse(localStorage.getItem("scheduleItemsStableV12") || "null") || structuredClone(defaultItems);
+let items = JSON.parse(localStorage.getItem("scheduleItemsStableV13") || "null") || structuredClone(defaultItems);
 const dayNames = ["sun","mon","tue","wed","thu","fri","sat"];
 let dragging = null;
 let dragOffsetX = 0;
@@ -585,7 +598,7 @@ function hitTest(x,y){
   }
   return null;
 }
-function saveItems(){localStorage.setItem("scheduleItemsStableV12", JSON.stringify(items))}
+function saveItems(){localStorage.setItem("scheduleItemsStableV13", JSON.stringify(items))}
 function drawCoverImage(img){
   const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
   const w = img.width * scale;
@@ -594,6 +607,97 @@ function drawCoverImage(img){
   const y = (canvas.height - h) / 2;
   ctx.drawImage(img, x, y, w, h);
 }
+
+function drawScheduleBox(item, opt){
+  const style = document.getElementById("boxStyle")?.value || "simple";
+  const x = item.x, y = item.y, w = item.w, h = item.h;
+  const boxColor = opt.boxColor;
+  const fill = hexToRgba(boxColor, opt.boxOpacity);
+  const stroke = hexToRgba(boxColor, opt.borderOpacity);
+  const lineWidth = opt.lineWidth;
+  let r = opt.radius;
+
+  ctx.save();
+  ctx.shadowColor = style === "neon" ? boxColor : "rgba(0,0,0,0.75)";
+  ctx.shadowBlur = style === "neon" ? 24 : opt.shadow;
+  ctx.shadowOffsetX = style === "neon" ? 0 : (opt.shadow ? 2 : 0);
+  ctx.shadowOffsetY = style === "neon" ? 0 : (opt.shadow ? 2 : 0);
+
+  if(style === "round") r = Math.min(h / 2, 70);
+
+  if(style === "ticket"){
+    r = Math.min(r, 22);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h/2 - 18);
+    ctx.arc(x + w, y + h/2, 18, -Math.PI/2, Math.PI/2, false);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + h/2 + 18);
+    ctx.arc(x, y + h/2, 18, Math.PI/2, -Math.PI/2, false);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  roundedRectPath(x,y,w,h,r);
+  ctx.fillStyle = style === "glass" ? "rgba(255,255,255,0.18)" : fill;
+  ctx.fill();
+  ctx.strokeStyle = style === "glass" ? "rgba(255,255,255,0.8)" : stroke;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+
+  if(style === "glass"){
+    ctx.globalAlpha = 0.35;
+    roundedRectPath(x + 10, y + 8, w - 20, Math.max(16, h * 0.28), Math.max(8, r - 6));
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  if(style === "double"){
+    roundedRectPath(x + 9, y + 9, w - 18, h - 18, Math.max(0, r - 8));
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = Math.max(1, lineWidth * 0.7);
+    ctx.stroke();
+  }
+
+  if(style === "leftbar"){
+    ctx.save();
+    roundedRectPath(x,y,w,h,r);
+    ctx.clip();
+    ctx.fillStyle = stroke;
+    ctx.fillRect(x, y, 22, h);
+    ctx.restore();
+  }
+
+  if(style === "speech"){
+    ctx.beginPath();
+    ctx.moveTo(x + 50, y + h - 1);
+    ctx.lineTo(x + 78, y + h + 24);
+    ctx.lineTo(x + 104, y + h - 1);
+    ctx.closePath();
+    ctx.fillStyle = style === "glass" ? "rgba(255,255,255,0.18)" : fill;
+    ctx.fill();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
 function roundedRectPath(x,y,w,h,r){
   ctx.beginPath();
   ctx.roundRect(x,y,w,h,r);
@@ -646,12 +750,13 @@ function render(){
     ctx.textAlign = "center";
     ctx.font = `${document.getElementById("titleWeight").value} ${Number(document.getElementById("titleSize").value || 62)}px ${document.getElementById("titleFont").value}`;
     drawText(document.getElementById("titleText").value, titleItem.x, titleItem.y);
+  }
 
-    const eventItem = items.find(i=>i.type==="event");
-    if(eventItem && document.getElementById("eventName").value.trim()){
-      ctx.font = `${document.getElementById("eventWeight").value} ${Number(document.getElementById("eventSize").value || 34)}px ${document.getElementById("eventFont").value}`;
-      drawText(document.getElementById("eventName").value, eventItem.x, eventItem.y);
-    }
+  const eventItem = items.find(i=>i.type==="event");
+  if(show("showEvent") && eventItem && document.getElementById("eventName").value.trim()){
+    ctx.textAlign = "center";
+    ctx.font = `${document.getElementById("eventWeight").value} ${Number(document.getElementById("eventSize").value || 34)}px ${document.getElementById("eventFont").value}`;
+    drawText(document.getElementById("eventName").value, eventItem.x, eventItem.y);
   }
 
   const boxItems = items.filter(i=>i.type==="box");
@@ -663,13 +768,14 @@ function render(){
       const lineWidth = Number(document.getElementById("boxLineWidth").value || 2);
       const radius = Number(document.getElementById("boxRadius").value || 24);
 
-      ctx.shadowBlur = shadow;
-      roundedRectPath(item.x,item.y,item.w,item.h,radius);
-      ctx.fillStyle = hexToRgba(boxColor, boxOpacity);
-      ctx.fill();
-      ctx.strokeStyle = hexToRgba(boxColor, borderOpacity);
-      ctx.lineWidth = lineWidth;
-      ctx.stroke();
+      drawScheduleBox(item, {
+        boxColor,
+        boxOpacity,
+        borderOpacity,
+        lineWidth,
+        radius,
+        shadow
+      });
 
       const startDateValue = document.getElementById("startDate").value;
       let day = "";
@@ -691,7 +797,8 @@ function render(){
 
       const memoSize = Number(document.getElementById("scheduleMemoSize").value || 38);
       ctx.font = `${document.getElementById("scheduleMemoWeight").value} ${memoSize}px ${document.getElementById("scheduleMemoFont").value}`;
-      wrapText(document.getElementById("s"+index).value, item.x + 115, item.y + 58, item.w - 140, memoSize * 1.15);
+      const textY = item.y + (item.h / 2) + (memoSize / 3);
+      wrapText(document.getElementById("s"+index).value, item.x + 175, textY, item.w - 200, memoSize * 1.15);
     });
   }
 
